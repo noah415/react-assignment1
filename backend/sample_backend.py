@@ -2,40 +2,46 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 from flask_cors import CORS
+from random import seed
+from random import randint
 
+seed(6459)
 app = Flask(__name__)
 CORS(app)
 
 users = { 
-   'users_list' :
+   "users_list" :
    [
       { 
-         'id' : 'xyz789',
-         'name' : 'Charlie',
-         'job': 'Janitor',
+         "id" : "xyz789",
+         "name" : "Charlie",
+         "job": "Janitor",
       },
       {
-         'id' : 'abc123', 
-         'name': 'Mac',
-         'job': 'Bouncer',
+         "id" : "abc123", 
+         "name": "Mac",
+         "job": "Bouncer",
       },
       {
-         'id' : 'ppp222', 
-         'name': 'Mac',
-         'job': 'Professor',
+         "id" : "ppp222", 
+         "name": "Mac",
+         "job": "Professor",
       }, 
       {
-         'id' : 'yat999', 
-         'name': 'Dee',
-         'job': 'Aspring actress',
+         "id" : "yat999", 
+         "name": "Dee",
+         "job": "Aspring actress",
       },
       {
-         'id' : 'zap555', 
-         'name': 'Dennis',
-         'job': 'Bartender',
+         "id" : "zap555", 
+         "name": "Dennis",
+         "job": "Bartender",
       }
    ]
 }
+
+def add_ID_to_user(user):
+   user['id'] = str(randint(0, 10000000000))
 
 @app.route('/users', methods=['GET', 'POST', 'DELETE'])
 def get_users():
@@ -55,8 +61,9 @@ def get_users():
       return users
    elif request.method == 'POST':
       userToAdd = request.get_json()
+      add_ID_to_user(userToAdd)
       users['users_list'].append(userToAdd)
-      resp = jsonify(success=True)
+      resp = jsonify(userToAdd) #change to jsonify(usertoadd)
       resp.status_code = 201 #optionally, you can always set a response code. 
       # 200 is the default code for a normal response
       return resp
