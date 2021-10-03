@@ -13,10 +13,6 @@ function MyApp() {
     setCharacters(updated);
   }
 
-  function updateList(person) {
-    setCharacters([...characters, person]);
-  }
-
   async function fetchAll() {
     try {
       const response = await axios.get('http://localhost:5000/users');
@@ -39,7 +35,7 @@ function MyApp() {
   async function makePostCall(person) {
     try {
       const response = await axios.post('http://localhost:5000/users', person);
-      return response;
+      return response.data;
     }
     catch(error) {
       console.log(error);
