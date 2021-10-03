@@ -6,11 +6,15 @@ import React, {useState, useEffect} from 'react';
 function MyApp() {
   const [characters, setCharacters] = useState([]);
 
-  function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index
-    });
-    setCharacters(updated);
+  async function removeOneCharacter(id) {
+    try {
+      const response = await axios.delete('http://localhost:5000/users', id);
+      return response.data;
+    }
+    catch(error) {
+      console.log(error);
+      return false;
+    }
   }
 
   async function fetchAll() {

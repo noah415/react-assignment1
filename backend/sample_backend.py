@@ -68,12 +68,13 @@ def get_users():
       # 200 is the default code for a normal response
       return resp
    elif request.method == 'DELETE':
-      delete_username = request.args.get('name')
-      for user in users['users_list']:
-         if user['name'] == delete_username:
-            del users['users_list'][user]
-      resp = jsonify(success=True)
-      return users
+      delete_id = request.args.get('id')
+      for i in range(len(users['users_list'])):
+         if users['users_list'][i]['id'] == delete_id:
+            del users['users_list'][i]
+      resp = jsonify(users)
+      resp.status_code = 202
+      return resp
 
 @app.route('/users/<id>')
 def get_user(id):
