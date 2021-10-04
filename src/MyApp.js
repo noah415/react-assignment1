@@ -8,8 +8,14 @@ function MyApp() {
 
   async function removeOneCharacter(id) {
     try {
-      const response = await axios.delete('http://localhost:5000/users', id);
-      return response.data;
+      const response = await axios.delete('http://localhost:5000/users?id='+id);
+      if (response.status === 204) {
+        const updated = characters.filter((character, i) => {
+          return characters[i]['id'] !== id
+        });
+        setCharacters(updated);
+      }
+      return response;
     }
     catch(error) {
       console.log(error);
@@ -30,11 +36,11 @@ function MyApp() {
   }
   
   useEffect(() => {
-    fetchAll().then( result => {
+    fetchAll().then(result => {
       if (result)
         setCharacters(result);
     });
-  }, [] );
+  }, []);
 
   async function makePostCall(person) {
     try {
@@ -50,7 +56,7 @@ function MyApp() {
   function updateList(person) {
     makePostCall(person).then(result => {
       if(result)
-        setCharacters([...characters, person]);
+        setCharacters([...characters, result]);
     });
   }
 

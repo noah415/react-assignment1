@@ -69,11 +69,21 @@ def get_users():
       return resp
    elif request.method == 'DELETE':
       delete_id = request.args.get('id')
+      found = False
+
       for i in range(len(users['users_list'])):
          if users['users_list'][i]['id'] == delete_id:
             del users['users_list'][i]
-      resp = jsonify(users)
-      resp.status_code = 202
+            found = True
+            break
+
+      if found:
+         resp = jsonify(success=True)
+         resp.status_code = 204
+      else:
+         resp = jsonify(success=False)
+         resp.status_code = 404
+
       return resp
 
 @app.route('/users/<id>')
