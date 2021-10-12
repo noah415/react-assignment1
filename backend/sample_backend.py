@@ -27,8 +27,12 @@ def get_users():
    if request.method == 'GET':
       search_username = request.args.get('name')
       search_job = request.args.get('job')
-      if search_username :
-         ret = jsonify(db_users.find_by_name(search_username))
+      if search_username:
+         if search_job:
+            ret = jsonify(db_users.find_by_name_job(search_username, search_job))
+         else:
+            ret = jsonify(db_users.find_by_name(search_username))
+
          return ret
       ret = jsonify(db_users.find_all())
       return ret
@@ -39,7 +43,7 @@ def get_users():
       new_user['name'] = userToAdd['name']
       new_user['job'] = userToAdd['job']
       new_user.save()
-      ret = jsonify(success=True)
+      ret = jsonify(db_users.find_by_id(new_user['_id'])[0])
       ret.status_code = 201 #optionally, you can always set a response code. 
       # 200 is the default code for a normal response
       return ret

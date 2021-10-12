@@ -11,7 +11,7 @@ function MyApp() {
       const response = await axios.delete('http://localhost:5000/users?id='+id);
       if (response.status === 204) {
         const updated = characters.filter((character, i) => {
-          return characters[i]['id'] !== id
+          return characters[i]['_id'] !== id
         });
         setCharacters(updated);
       }
@@ -26,7 +26,7 @@ function MyApp() {
   async function fetchAll() {
     try {
       const response = await axios.get('http://localhost:5000/users');
-      return response.data.users_list;
+      return response.data;
     }
     catch(error) {
       // We're not handling errors. Just logging into the console
