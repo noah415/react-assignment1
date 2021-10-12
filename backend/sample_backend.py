@@ -1,47 +1,26 @@
+"""
+Noah Otsuka
+CSC307
+
+$ export FLASK_APP=sample_backend.py
+$ export FLASK_ENV=development
+$ flask run
+"""
+
 from flask import Flask
 from flask import request
 from flask import jsonify
 from flask_cors import CORS
 from random import seed
 from random import randint
+import model_mongodb as db
 
 seed(6459)
 app = Flask(__name__)
 CORS(app)
 
-users = { 
-   "users_list" :
-   [
-      { 
-         "id" : "xyz789",
-         "name" : "Charlie",
-         "job": "Janitor",
-      },
-      {
-         "id" : "abc123", 
-         "name": "Mac",
-         "job": "Bouncer",
-      },
-      {
-         "id" : "ppp222", 
-         "name": "Mac",
-         "job": "Professor",
-      }, 
-      {
-         "id" : "yat999", 
-         "name": "Dee",
-         "job": "Aspring actress",
-      },
-      {
-         "id" : "zap555", 
-         "name": "Dennis",
-         "job": "Bartender",
-      }
-   ]
-}
-
-def add_ID_to_user(user):
-   user['id'] = str(randint(0, 10000000000))
+# implementing the mongodb
+db_users = db.User()
 
 @app.route('/users', methods=['GET', 'POST', 'DELETE'])
 def get_users():
@@ -49,35 +28,27 @@ def get_users():
       search_username = request.args.get('name')
       search_job = request.args.get('job')
       if search_username :
-         subdict = {'users_list' : []}
-         for user in users['users_list']:
-            if search_username == user['name']:
-               if search_job:
-                  if search_job == user['job']:
-                     subdict['users_list'].append(user)
-               else:
-                  subdict['users_list'].append(user)
-         return subdict
-      return users
+         ret = jsonify(db_users.find_by_name(search_username))
+         return ret
+      ret = jsonify(db_users.find_all())
+      return ret
    elif request.method == 'POST':
       userToAdd = request.get_json()
-      add_ID_to_user(userToAdd)
-      users['users_list'].append(userToAdd)
-      resp = jsonify(userToAdd) #change to jsonify(usertoadd)
-      resp.status_code = 201 #optionally, you can always set a response code. 
+      # add logic here
+      new_user = db.Model()
+      new_user['name'] = userToAdd['name']
+      new_user['job'] = userToAdd['job']
+      new_user.save()
+      ret = jsonify(success=True)
+      ret.status_code = 201 #optionally, you can always set a response code. 
       # 200 is the default code for a normal response
-      return resp
+      return ret
    elif request.method == 'DELETE':
       delete_id = request.args.get('id')
-      found = False
 
-      for i in range(len(users['users_list'])):
-         if users['users_list'][i]['id'] == delete_id:
-            del users['users_list'][i]
-            found = True
-            break
-
-      if found:
+      old_user = db.Model()
+      old_user["_id"] = delete_id
+      if old_user.remove():
          resp = jsonify(success=True)
          resp.status_code = 204
       else:
@@ -89,9 +60,6 @@ def get_users():
 @app.route('/users/<id>')
 def get_user(id):
    if id:
-      for user in users['users_list']:
-         if user['id'] == id:
-           return user
-      return ({})
-   return users
+      return jsonify(db_users.find_by_id(id))
+   return jsonify(db_users.find_all())
 
